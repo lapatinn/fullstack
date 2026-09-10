@@ -11,7 +11,7 @@ Server-->>Browser: main.css
 Browser->>Server: GET https://studies.cs.helsinki.fi/exampleapp/main.js
 Server-->>Browser: main.js
 Note over Browser,Server: Browser starts executing main.js
-Browser->>Server: https://studies.cs.helsinki.fi/exampleapp/data.json
+Browser->>Server: GET https://studies.cs.helsinki.fi/exampleapp/data.json
 Server-->>Browser: [{"content":"test","date":"2026-09-10" ...}]
 Note over Browser,Server: main.js callback function that shows notes
 ```
