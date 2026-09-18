@@ -32,7 +32,7 @@ const App = () => {
           Bad: {bad} <br />
           All: {all} <br />
           Average: {avg} <br />
-          Positive: {pos}%
+          Positive: {pos}% 
         </p>
       </div>
     </div>
