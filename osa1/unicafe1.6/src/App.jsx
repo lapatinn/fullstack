@@ -5,7 +5,7 @@ const Statistics = (props) => {
   const avg = ((props.good * 1) + (props.neutral * 0) + (props.bad * -1)) / all
   const pos = (props.good / all) * 100
 
-  if (all != 0) {
+  if (all > 0) {
     return (
       <div>
         Good: {props.good}<br />
