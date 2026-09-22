@@ -2,19 +2,39 @@ import { useState } from 'react'
 
 const Statistics = (props) => {
   const all = props.good + props.neutral + props.bad
-  const avg = ((props.good * 1) + (props.neutral * 0) + (props.bad * -1)) / all
-  const pos = (props.good / all) * 100 + "%"
+  const avg = parseFloat(((props.good * 1) + (props.neutral * 0) + (props.bad * -1)) / all).toFixed(2)
+  const pos = parseFloat((props.good / all) * 100).toFixed(2) + " %"
 
   if (all > 0) {
     return (
-      <div>
-        <StatisticLine text="Good" value={props.good}/>
-        <StatisticLine text="Neutral" value={props.neutral}/>
-        <StatisticLine text="Bad" value={props.bad}/>
-        <StatisticLine text="All" value={all}/>
-        <StatisticLine text="Average" value={avg}/>
-        <StatisticLine text="Positive" value={pos}/>
-      </div>
+      <table>
+        <tbody>
+          <tr>
+            <td>Good</td>
+            <td>{props.good}</td>
+          </tr>
+          <tr>
+            <td>Neutral</td>
+            <td>{props.neutral}</td>
+          </tr>
+          <tr>
+            <td>Bad</td>
+            <td>{props.bad}</td>
+          </tr>
+          <tr>
+            <td>All</td>
+            <td>{all}</td>
+          </tr>
+          <tr>
+            <td>Average</td>
+            <td>{avg}</td>
+          </tr>
+          <tr>
+            <td>Positive</td>
+            <td>{pos}</td>
+          </tr>
+        </tbody>
+      </table>
     )
   }
   else {
