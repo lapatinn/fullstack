@@ -11,7 +11,6 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [newQuery, setNewQuery] = useState('')
-  const [showAll, setShowAll] = useState(true)
 
   const addEntry = (event) => {
     event.preventDefault()
@@ -33,28 +32,19 @@ const App = () => {
   }
 
   const handleNameChange = (event) => {
-    console.log(event.target.value)
     setNewName(event.target.value)
   }
 
   const handleNumberChange = (event) => {
-    console.log(event.target.value)
     setNewNumber(event.target.value)
   }
 
   const handleQueryChange = (event) => {
-    console.log(event.target.value)
     setNewQuery(event.target.value)
   }
 
-  // const entriesToShow = showAll
-  //   ? persons
-  //   : persons.filter(person => person.name.)
-
-
-  console.log(persons)
-  const names = persons.map(person => 
-    <div key={person.name}>{person.name} {person.number}</div>
+  const personsToShow = persons.filter(person =>
+    person.name.toLowerCase().includes(newQuery.toLowerCase())
   )
 
   return (
@@ -79,7 +69,11 @@ const App = () => {
 
       <h2>Numbers</h2>
       <div>
-        {names}
+        {personsToShow.map(person =>
+          <div key={person.name}>
+            {person.name} {person.number}
+          </div>
+        )}
       </div>
     </div>
   )
