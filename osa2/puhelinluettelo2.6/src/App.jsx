@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
+import personService from './services/persons'
+import persons from './services/persons'
 
 const FilterForm = ({ query, handler }) => {
   return(
@@ -27,22 +28,26 @@ const PersonForm = ({ name, number, namehand, numhand, addEntry }) => {
   )
 }
 
-const Persons = ({ persons }) => {
+const Persons = ({ persons, remover }) => {
   return(
     <div>
       {persons.map(person =>
-        <div key={person.name}>
-          <Person name={person.name} number={person.number}/>
+        <div key={person.id}>
+          <Person 
+          name={person.name} 
+          number={person.number} 
+          remover={() => {remover(person.id)}}
+          />
         </div>
       )}
     </div>
   )
 }
 
-const Person = ({ name, number }) => {
+const Person = ({ name, number, remover }) => {
   return(
     <div>
-      {name} {number}
+      {name} {number} <button onClick={remover}>Delete</button>
     </div>
   )
 }
@@ -54,15 +59,40 @@ const App = () => {
   const [newQuery, setNewQuery] = useState('')
 
   useEffect(() => {
-    console.log('effect starts')
-    axios
-    .get('http://localhost:3001/persons')
-    .then(response => {
-      console.log('promise fulfilled')
-      setPersons(response.data)
+    personService
+    .getAll()
+    .then(initialPersons => {
+      setPersons(initialPersons)
     })
   }, [])
-  console.log('rendered', persons.length, 'persons')
+
+  const addEntry = (event) => {
+    event.preventDefault()
+    if (persons.some(person => person.name === newName)) {
+      alert(`${newName} is already added to phonebook`)
+      return
+    }
+    const personObject = {
+      name: newName,
+      number: newNumber
+    }
+
+    personService
+    .create(personObject)
+    .then(person => {
+      setPersons(persons.concat(person))
+      setNewName('')
+      setNewNumber('')
+    })
+  }
+
+  const removePerson = (id) => {
+    personService
+    .remove(id)
+    .then(personsAfterDelete => {
+      setPersons(personsAfterDelete)
+    })
+  }
 
   const handleNameChange = (event) => {
     setNewName(event.target.value)
@@ -77,21 +107,6 @@ const App = () => {
   const personsToShow = persons.filter(person =>
     person.name.toLowerCase().includes(newQuery.toLowerCase())
   )
-  
-  const addEntry = (event) => {
-    event.preventDefault()
-    if (persons.some(person => person.name === newName)) {
-      alert(`${newName} is already added to phonebook`)
-      return
-    }
-    const personObject = {
-      name: newName,
-      number: newNumber
-    }
-    setPersons(persons.concat(personObject))
-    setNewName('')
-    setNewNumber('')
-  }
 
   return (
     <div>
@@ -105,7 +120,7 @@ const App = () => {
       addEntry = {addEntry}/>
       <h2>Numbers</h2>
       <div>
-        <Persons persons={personsToShow} />
+        <Persons persons={personsToShow} remover={removePerson}/>
       </div>
     </div>
   )
