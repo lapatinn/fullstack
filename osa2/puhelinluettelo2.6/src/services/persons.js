@@ -12,12 +12,11 @@ const create = (personObject) => {
 }
 
 const remove = (id) => {
-    if (window.confirm('Do you want to delete this entry?')) {
-        const response = axios.delete(`${url}/${id}`)
+    const response = axios.delete(`${url}/${id}`)
+    return response.then(response => {
+        console.log(response)
         return getAll()
-    } else {
-        return
-    }
+    })
 }
 
 export default { getAll, create, remove }

@@ -87,11 +87,14 @@ const App = () => {
   }
 
   const removePerson = (id) => {
-    personService
-    .remove(id)
-    .then(personsAfterDelete => {
-      setPersons(personsAfterDelete)
-    })
+    if (window.confirm('Do you want to delete this entry?')) {
+      personService
+      .remove(id)
+      .then(personsAfterDelete => {
+        console.log(personsAfterDelete)
+        setPersons(personsAfterDelete)
+      })
+    } else {return}
   }
 
   const handleNameChange = (event) => {
