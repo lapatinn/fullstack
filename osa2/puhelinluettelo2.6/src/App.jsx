@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import personService from './services/persons'
-import Notification from './components/Notification'
+import { Notification, Error } from './components/Notification'
 
 const FilterForm = ({ query, handler }) => {
   return(
@@ -58,8 +58,10 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('')
   const [newQuery, setNewQuery] = useState('')
   const [successMessage, setSuccessMessage] = useState(null)
+  const [errorMessage, setErrorMessage] = useState(null)
 
   useEffect(() => {
+
     personService
     .getAll()
     .then(initialPersons => {
@@ -85,15 +87,25 @@ const App = () => {
           setSuccessMessage(
             `Updated number of ${personToUpdate.name}`
           )
+
           setTimeout(() => {
             setSuccessMessage(null)
           }, 4000)
         })
+
+        .catch(error => {
+          setErrorMessage(`${personObject.name} has already been removed`)
+        })
+
+        setTimeout(() => {
+          setErrorMessage(null)
+        }, 4000);
       } else return
 
     } else {
       personService
       .create(personObject)
+
       .then(person => {
         setPersons(persons.concat(person))
         setNewName('')
@@ -101,6 +113,7 @@ const App = () => {
         setSuccessMessage(
           `${personObject.name} added to phonebook`
         )
+
         setTimeout(() => {
           setSuccessMessage(null)
         }, 4000)
@@ -111,13 +124,16 @@ const App = () => {
   const removePerson = (id) => {
     const personToDelete = persons.find(person => person.id === id)
     if (window.confirm(`Do you wish to delete ${personToDelete.name} from phonebook?`)) {
+
       personService
       .remove(id)
+
       .then(personsAfterDelete => {
         setPersons(personsAfterDelete)
         setSuccessMessage(
           `${personToDelete.name} removed from phonebook`
         )
+
         setTimeout(() => {
           setSuccessMessage(null)
         }, 4000);
@@ -142,6 +158,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Error message={errorMessage}/>
       <Notification message={successMessage}/>
       <div>
         <FilterForm query = {newQuery} handler = {handleQueryChange} />
