@@ -22,8 +22,13 @@
     },
     {
       "name": "Lauri",
-      "number": "123",
+      "number": "123123",
       "id": "YOJwvA9ld_k"
+    },
+    {
+      "name": "Pauri",
+      "number": "123123",
+      "id": "eiwtEqolKZM"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"

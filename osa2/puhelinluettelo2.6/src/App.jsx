@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import personService from './services/persons'
-import persons from './services/persons'
+import Notification from './components/Notification'
 
 const FilterForm = ({ query, handler }) => {
   return(
@@ -57,6 +57,7 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [newQuery, setNewQuery] = useState('')
+  const [successMessage, setSuccessMessage] = useState(null)
 
   useEffect(() => {
     personService
@@ -76,13 +77,20 @@ const App = () => {
     if (persons.some(person => person.name === newName)) {
       if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
         const personToUpdate = persons.find(person => person.name === newName)
-        console.log(personToUpdate.id)
+  
         personService
         .update(personToUpdate.id, personObject)
         .then(personsAfterUpdate => {
           setPersons(personsAfterUpdate)
+          setSuccessMessage(
+            `Updated number of ${personToUpdate.name}`
+          )
+          setTimeout(() => {
+            setSuccessMessage(null)
+          }, 4000)
         })
       } else return
+
     } else {
       personService
       .create(personObject)
@@ -90,17 +98,29 @@ const App = () => {
         setPersons(persons.concat(person))
         setNewName('')
         setNewNumber('')
+        setSuccessMessage(
+          `${personObject.name} added to phonebook`
+        )
+        setTimeout(() => {
+          setSuccessMessage(null)
+        }, 4000)
       })
     }
   }
 
   const removePerson = (id) => {
-    if (window.confirm('Do you want to delete this entry?')) {
+    const personToDelete = persons.find(person => person.id === id)
+    if (window.confirm(`Do you wish to delete ${personToDelete.name} from phonebook?`)) {
       personService
       .remove(id)
       .then(personsAfterDelete => {
-        console.log(personsAfterDelete)
         setPersons(personsAfterDelete)
+        setSuccessMessage(
+          `${personToDelete.name} removed from phonebook`
+        )
+        setTimeout(() => {
+          setSuccessMessage(null)
+        }, 4000);
       })
     } else {return}
   }
@@ -122,6 +142,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={successMessage}/>
       <div>
         <FilterForm query = {newQuery} handler = {handleQueryChange} />
       </div>
