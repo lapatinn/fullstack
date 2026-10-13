@@ -9,7 +9,10 @@ const FilterForm = ({ query, handler }) => {
   )
 }
 
-const Countries = ({ countries, query }) => {
+const Countries = ({ countries, query, handleShow, selectedCountry }) => {
+  if (selectedCountry) {
+    return <CountryInfo country={selectedCountry} />
+  }
   if (query != '') {
     if (countries.length >= 10) {
       console.log('cntry len: ', countries.length)
@@ -31,7 +34,7 @@ const Countries = ({ countries, query }) => {
       return(
         <div>
           {countries.map(ctry =>
-            <CountryName name={ctry.name.common}/>
+            <CountryName key={ctry.name.common} country={ctry} handleShow={handleShow}/>
           )}
         </div>
       )
@@ -45,10 +48,19 @@ const Countries = ({ countries, query }) => {
   }
 }
 
-const CountryName = ({ name }) => {
+
+const ShowButton = ({ country, handleShow }) => {
+  return(
+      <button onClick={() => handleShow(country)}>
+        Show
+      </button>
+  )
+}
+
+const CountryName = ({ country, handleShow }) => {
   return(
     <div>
-      {name}
+      {country.name.common} <ShowButton country={country} handleShow={handleShow} />
     </div>
   )
 }
@@ -82,11 +94,17 @@ const CountryInfo = ({ country }) => {
 const App = () => {
   const [countries, setCountries] = useState([])
   const [newQuery, setNewQuery] = useState('')
+  const [selectedCountry, setSelectedCountry] = useState(null)
 
   const handleQueryChange = (event) => {
     setNewQuery(event.target.value)
+    setSelectedCountry(null)
   }
   console.log('query: ', newQuery)
+
+  const handleShow = (country) => {
+    setSelectedCountry(country)
+  }
 
   useEffect(() => {
     countryService
@@ -97,7 +115,7 @@ const App = () => {
   }, [])
   console.log('countries: ', countries)
 
-  const countriesToShow = countries.filter(country => 
+  const countriesToShow = countries.filter(country =>
     country.name.common.toLowerCase().includes(newQuery.toLowerCase())
   )
   console.log('countriesToShow: ', countriesToShow)
@@ -107,10 +125,18 @@ const App = () => {
     <div>
       <h1>Super advanced country info provider</h1>
       <div>
-        <FilterForm query={newQuery} handler={handleQueryChange} />
+        <FilterForm 
+          query={newQuery} 
+          handler={handleQueryChange} 
+        />
       </div>
       <div>
-        <Countries countries={countriesToShow} query={newQuery}/>
+        <Countries 
+          countries={countriesToShow} 
+          query={newQuery}
+          handleShow={handleShow}
+          selectedCountry={selectedCountry}
+        />
       </div>
     </div>
   )
