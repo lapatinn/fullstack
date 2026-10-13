@@ -1,5 +1,15 @@
 import { useState, useEffect } from 'react'
+import axios from 'axios'
 import countryService from './services/countries'
+
+const apikey = import.meta.env.VITE_WEATHER_API_KEY
+
+const GetWeatherData = (country) => {
+  const lat = country.latlng[0]
+  const lon = country.latlng[1]
+  const response = axios.get(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apikey}&units=metric`)
+  return response.then(response => response.data)
+}
 
 const FilterForm = ({ query, handler }) => {
   return(
@@ -15,7 +25,6 @@ const Countries = ({ countries, query, handleShow, selectedCountry }) => {
   }
   if (query != '') {
     if (countries.length >= 10) {
-      console.log('cntry len: ', countries.length)
       return(
         <div>
           Too many matches, specify another filter.
@@ -48,7 +57,6 @@ const Countries = ({ countries, query, handleShow, selectedCountry }) => {
   }
 }
 
-
 const ShowButton = ({ country, handleShow }) => {
   return(
       <button onClick={() => handleShow(country)}>
@@ -66,6 +74,16 @@ const CountryName = ({ country, handleShow }) => {
 }
 
 const CountryInfo = ({ country }) => {
+  const [weather, setWeather] = useState(null)
+  const [weatherIcon, setWeatherIcon] = useState(null)
+
+  useEffect(() => {
+    GetWeatherData(country)
+    .then(data => {
+      setWeather(data)
+    })
+  }, [country])
+
   return(
     <div>
       <h2>{country.name.common}</h2>
@@ -87,6 +105,17 @@ const CountryInfo = ({ country }) => {
       <div>
         <img src={`${country.flags.png}`} alt={`Flag of ${country.name.common}`} />
       </div>
+      <h3>Weather in {country.capital}</h3>
+        {weather === null ? (
+          <p>Loading...</p>
+        ) : (
+          <div>
+            <p>Temperature {weather.main.temp} Celsius</p>
+            <img src={`https://openweathermap.org/payload/api/media/file/${weather.weather[0].icon}.png`} alt="" />
+            <p>{weather.weather[0].main}</p>
+            <p>Wind {weather.wind.speed} m/s</p>
+          </div>
+        )}
     </div>
   )
 }
@@ -100,7 +129,6 @@ const App = () => {
     setNewQuery(event.target.value)
     setSelectedCountry(null)
   }
-  console.log('query: ', newQuery)
 
   const handleShow = (country) => {
     setSelectedCountry(country)
@@ -113,13 +141,10 @@ const App = () => {
       setCountries(initialCountries)
     })
   }, [])
-  console.log('countries: ', countries)
 
   const countriesToShow = countries.filter(country =>
     country.name.common.toLowerCase().includes(newQuery.toLowerCase())
   )
-  console.log('countriesToShow: ', countriesToShow)
-  console.log('found countries: ', countriesToShow.map(ctry => ctry.name.common))
 
   return(
     <div>
