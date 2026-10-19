@@ -25,11 +25,19 @@ let persons = [
 ]
 
 app.get('/', (request, response) => {
-    response.send('This is frontpage')
+    response.send('Hello frontpage')
 })
 
 app.get('/api/persons', (request, response) => {
     response.json(persons)
+})
+
+app.get('/info', (request, response) => {
+    const count = persons.length
+    const date = new Date()
+    response.send(`<p>Phonebook contains ${count} people.<p/> 
+        <p>${date}</p>`)
+
 })
 
 const PORT = 3001
