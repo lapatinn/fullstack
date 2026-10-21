@@ -1,0 +1,7 @@
+POST https://fullstack-dnfl.onrender.com/api/persons
+Content-Type: application/json
+
+{
+    "name": "Lauri3",
+    "number": "123234345"
+}
