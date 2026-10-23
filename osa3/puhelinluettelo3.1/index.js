@@ -6,6 +6,7 @@ const app = express()
 
 app.use(express.json())
 app.use(cors())
+app.use(express.static('dist'))
 
 // Morganilla on joku ongelma! Tulostaa kenoviivan aina ennen "-merkkiä!
 // Tuhlasin varmaan tunnin korjaamiseen, mutta mikään vääntö ei auta olen Raivoissani
