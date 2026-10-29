@@ -1,7 +1,7 @@
 require('dotenv').config()
+
 const express = require('express')
 const morgan = require('morgan')
-const mongoose = require('mongoose')
 const Person = require('./models/person')
 
 const app = express()
@@ -26,12 +26,6 @@ app.use(morgan(function (tokens, req, res) {
   ].join(' ')
 }))
 
-const unknownEndpoint = (request, response) => {
-  console.log('\nFrom unknownEndpoint:')
-  response.status(404).send({ error: 'unknown endpoint' })
-}
-
-
 const ErrorHandler = (error, request, response, next) => {
   console.log('\nFrom ErrorHandler:')
   console.log(error.message)
@@ -43,7 +37,7 @@ const ErrorHandler = (error, request, response, next) => {
 }
 
 app.get('/', (request, response) => {
-  response.send('Hello frontpage')
+  response.send('Welcome to tha backend')
 })
 
 app.get('/api/persons', (request, response) => {
@@ -53,10 +47,13 @@ app.get('/api/persons', (request, response) => {
 })
 
 app.get('/info', (request, response) => {
-  const count = persons.length
-  const date = new Date()
-  response.send(`<p>Phonebook contains ${count} people.<p/> 
-        <p>${date}</p>`)
+  const ppl = Person.find({}).then(persons => {
+    const count = persons.length
+    const date = new Date()
+    response.send(`<p>Phonebook contains ${count} people.<p/> 
+        <p>Accessed on: ${date}</p>`)
+  })
+
 })
 
 app.get('/api/persons/:id', (request, response, next) => {
@@ -72,15 +69,9 @@ app.get('/api/persons/:id', (request, response, next) => {
 })
 
 app.delete('/api/persons/:id', (request, response, next) => {
-  Person.findById(request.params.id)
-  .then(person => {
-    if (person) {
-      person.deleteOne().then(deletedPerson => {
-        response.json(deletedPerson)
-      })
-    } else {
-      response.status(404).end()
-    }
+  Person.findByIdAndDelete(request.params.id)
+  .then(result => {
+    response.status(204).end()
   })
   .catch(error => next(error))
 })
@@ -88,21 +79,44 @@ app.delete('/api/persons/:id', (request, response, next) => {
 app.post('/api/persons', (request, response) => {
   const body = request.body
 
-  if (!body.name || !body.number) {
-    return response.status(400).json({
-      error: 'content missing'
+  if (body.name && body.number) {
+    const person = new Person({
+      name: body.name,
+      number: body.number,
     })
+    person.save().then(savedPerson => {
+      response.json(savedPerson)
+    })
+
+  } else {
+    return response.status(400).json({ error: 'Content missing' })
   }
-
-  const person = new Person({
-    name: body.name,
-    number: body.number,
-  })
-
-  person.save().then(savedPerson => {
-    response.json(savedPerson)
-  })
 })
+
+app.put('/api/persons/:id', (request, response, next) => {
+  const { name, number } = request.body
+  console.log('person to update', name, number)
+
+  Person.findById(request.params.id)
+  .then((person) => {
+    if (!person) {
+      return response.status(404).end()
+    }
+
+    person.name = name
+    person.number = number
+
+    return person.save().then((updatedPerson) => {
+      response.json(updatedPerson)
+    })
+  })
+  .catch((error) => next(error))
+})
+
+const unknownEndpoint = (request, response) => {
+  console.log('\nFrom unknownEndpoint:')
+  response.status(404).send({ error: 'unknown endpoint' })
+}
 
 app.use(unknownEndpoint)
 app.use(ErrorHandler)
