@@ -71,11 +71,18 @@ app.get('/api/persons/:id', (request, response, next) => {
   .catch(error => next(error))
 })
 
-app.delete('/api/persons/:id', (request, response) => {
-  const id = request.params.id
-  persons = persons.filter(p => p.id != id)
-
-  response.status(204).end()
+app.delete('/api/persons/:id', (request, response, next) => {
+  Person.findById(request.params.id)
+  .then(person => {
+    if (person) {
+      person.deleteOne().then(deletedPerson => {
+        response.json(deletedPerson)
+      })
+    } else {
+      response.status(404).end()
+    }
+  })
+  .catch(error => next(error))
 })
 
 app.post('/api/persons', (request, response) => {
@@ -97,8 +104,8 @@ app.post('/api/persons', (request, response) => {
   })
 })
 
-app.use(ErrorHandler)
 app.use(unknownEndpoint)
+app.use(ErrorHandler)
 
 const PORT = process.env.PORT
 app.listen(PORT, () => {
