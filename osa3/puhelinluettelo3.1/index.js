@@ -6,8 +6,8 @@ const Person = require('./models/person')
 
 const app = express()
 
-app.use(express.json())
 app.use(express.static('dist'))
+app.use(express.json())
 
 // Morganilla on joku ongelma! Tulostaa kenoviivan aina ennen "-merkkiä!
 // Tuhlasin varmaan tunnin korjaamiseen, mutta mikään vääntö ei auta olen Raivoissani
@@ -26,36 +26,20 @@ app.use(morgan(function (tokens, req, res) {
   ].join(' ')
 }))
 
-let persons = [
-  {
-    id: "1",
-    name: "Arto Hellas",
-    number: "040-123456"
-  },
-  {
-    id: "2",
-    name: "Ada Lovelace",
-    number: "39-44-532532"
-  },
-  {
-    id: "3",
-    name: "Dan Abramov",
-    number: "12-43-234234"
-  },
-  {
-    id: "4",
-    name: "Mary Poppendieck",
-    number: "39-23-6423122"
-  }
-]
-
-function getRandomInt(max) {
-  return Math.floor(Math.random() * max)
+const unknownEndpoint = (request, response) => {
+  console.log('\nFrom unknownEndpoint:')
+  response.status(404).send({ error: 'unknown endpoint' })
 }
 
-const generateId = () => {
-  const newId = getRandomInt(9999)
-  return newId
+
+const ErrorHandler = (error, request, response, next) => {
+  console.log('\nFrom ErrorHandler:')
+  console.log(error.message)
+
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error: 'Malformatted id' })
+  }
+  next(error)
 }
 
 app.get('/', (request, response) => {
@@ -75,11 +59,16 @@ app.get('/info', (request, response) => {
         <p>${date}</p>`)
 })
 
-app.get('/api/persons/:id', (request, response) => {
+app.get('/api/persons/:id', (request, response, next) => {
   Person.findById(request.params.id)
   .then(person => {
+    if (person) {
     response.json(person)
+    } else {
+      response.status(404).end()
+    }
   })
+  .catch(error => next(error))
 })
 
 app.delete('/api/persons/:id', (request, response) => {
@@ -107,6 +96,9 @@ app.post('/api/persons', (request, response) => {
     response.json(savedPerson)
   })
 })
+
+app.use(ErrorHandler)
+app.use(unknownEndpoint)
 
 const PORT = process.env.PORT
 app.listen(PORT, () => {
