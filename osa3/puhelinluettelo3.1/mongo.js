@@ -49,7 +49,7 @@ if (process.argv.length === 5) {
     number: input_number,
   })
 
-  person.save().then(result => {
+  person.save().then(() => {
     console.log(`Person ${input_name} saved!`)
     mongoose.connection.close()
   })
