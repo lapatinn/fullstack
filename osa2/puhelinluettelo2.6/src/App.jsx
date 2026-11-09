@@ -118,6 +118,13 @@ const App = () => {
           setSuccessMessage(null)
         }, 4000)
       })
+      .catch(error => {
+        console.log(error.response.data)
+        setErrorMessage(error.response.data.error)
+        setTimeout(() => {
+          setErrorMessage(null)
+        }, 4000)
+      })
     }
   }
 
