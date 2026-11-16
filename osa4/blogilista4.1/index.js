@@ -4,6 +4,8 @@ const mongoose = require('mongoose')
 const logger = require('./utils/logger')
 const config = require('./utils/config')
 
+//const blogsRouter = require('./controllers/blogs')
+
 const app = express()
 
 const blogSchema = mongoose.Schema({
