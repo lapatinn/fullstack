@@ -2,9 +2,9 @@ POST http://localhost:3003/api/blogs
 Content-Type: application/json
 
 {
-    "title": "blog title 3",
-    "author": "John Blog the 3rd",
+    "title": "blog title 4",
+    "author": "John Blog the 4th",
     "url": "https://johnblog.com",
-    "likes": 1
+    "likes": 10000000000000000
 
 }
