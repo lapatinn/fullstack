@@ -10,7 +10,18 @@ const totalLikes = (blogs) => {
     return likes
 }
 
+const favoriteBlog = (blogs) => {
+  if (blogs.length > 0) {
+    return blogs.toSorted(function(a, b){
+      return b.likes - a.likes
+    })[0]
+  } else {
+    return "no blogs"
+  }
+}
+
 module.exports = {
   dummy,
-  totalLikes
+  totalLikes,
+  favoriteBlog
 }
